@@ -2,11 +2,13 @@
 
 This Python task involves fetching data from API, JSON data handling, working with parquet files
 and performing simple calculations. Also, it requires basic git skills to upload the results. 
+You will need to compare two product lists - actual data from url and expected data stored in parquet file.
 
 ### Actual data
 Get products data from `https://dummyjson.com/products`
-- Total amount of products > 100 (use query parameters in the above path)
+- **Total amount of products > 100** (use query parameters in the above path)
 - Final price for each product can be calculated using 2 fields from the response - "price" and "discountPercentage"
+- **Please, do not overwrite expected data with actual data!** Use different path if you want to save actual data.
 
 ### Expected data 
 Stored in `./data/product_prices_calculated.parquet`
