@@ -23,8 +23,9 @@ Stored in `./data/product_prices_calculated.parquet`
 1. Clone this repo (not fork)
 2. Create separate feature branch
 3. Write your Python code that answers the above questions
-4. Create PR into the master branch
-5. Share the PR link with our HR
+4. Please, run your code before creating PR - it should pass without errors
+5. Create PR into the master branch
+6. Share the PR link with our HR
 
 **Pay attention, that your code should follow PEP8 standards.** 
 - It should be easy to read, effective and explicit.
