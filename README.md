@@ -12,11 +12,11 @@ Get products data from `https://dummyjson.com/products`
 
 ### Expected data 
 Stored in `./data/product_prices_calculated.parquet`
-- Final price in expected data has been rounded to 2 decimal places
+- Final price in expected data is rounded to 2 decimal places
 
 ### Questions
 1. What product is the most expensive according to actual data?
-2. What product is missing in expected data?
+2. What product is missing in expected data comparing with actual data?
 3. For how many rows final price in expected data matches with calculated price from actual data?
 
 ### Task
