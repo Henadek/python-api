@@ -6,7 +6,7 @@ You will need to compare two product lists - actual data from url and expected d
 
 ### Actual data
 Get products data from `https://dummyjson.com/products`
-- **Total amount of products > 100** (use query parameters in the above path)
+- **Amount of products returned by this API is 194 (not 100!), use query params to get all of them**
 - Final price for each product can be calculated using 2 fields from the response - "price" and "discountPercentage"
 - **Please, do not overwrite expected data with actual data!** Use different path if you want to save actual data.
 
@@ -18,6 +18,7 @@ Stored in `./data/product_prices_calculated.parquet`
 1. What product is the most expensive according to actual data?
 2. What product is missing in expected data comparing with actual data?
 3. For how many rows final price in expected data matches with calculated price from actual data?
+**All questions have meaningful answers (not 0 or 194)**
 
 ### Task
 1. Clone this repo (not fork)
