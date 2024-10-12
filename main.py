@@ -1,10 +1,11 @@
 import json
 import logging
 import os
-from typing import Dict
+from typing import Any, Dict
 
 import pandas as pd
 import requests
+from pandas import DataFrame
 
 from utils import analyze_data, load_data
 
@@ -69,7 +70,7 @@ def scraper(
     logging.info(f"Starting scraper on Url: {url} ...")
 
     # Fetch actual data from API
-    result = {}
+    result: Dict[str, Any] = {}
     actual_data_path = fetch_actual_data(url, limit, skip)
     actual_df: pd.DataFrame = load_data(actual_data_path)
     logging.info("Loaded actual product data from parquet")
@@ -79,6 +80,8 @@ def scraper(
     logging.info("Loaded expected product data from parquet")
 
     # Analyze data and get the answers
+    missing_products: DataFrame
+    price_matches: int
     most_expensive_product, missing_products, price_matches = analyze_data(
         actual_df, expected_df
     )
