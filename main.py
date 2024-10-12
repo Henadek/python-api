@@ -80,7 +80,6 @@ def scraper(
     logging.info("Loaded expected product data from parquet")
 
     # Analyze data and get the answers
-    missing_products: DataFrame
     price_matches: int
     most_expensive_product, missing_products, price_matches = analyze_data(
         actual_df, expected_df

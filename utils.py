@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple
+from typing import Any, Tuple
 
 import pandas as pd
 
@@ -29,12 +29,13 @@ def analyze_data(
     price matches from actual to expected data
     """
     # Q1: What is the most expensive product according to actual data?
-    most_expensive_product: str = actual_df.loc[actual_df["final_price"].idxmax()][
-        "title"
-    ]
+    most_expensive_product: str | Any = actual_df.loc[
+        actual_df["final_price"].idxmax()
+    ]["title"]
 
     # Q2: What product is missing in expected data?
-    missing_products: pd.DataFrame = pd.merge(
+    missing_products: pd.DataFrame | pd.Series
+    missing_products = pd.merge(
         actual_df,
         expected_df,
         how="left",
