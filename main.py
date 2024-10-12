@@ -57,7 +57,7 @@ def load_data(filepath: str) -> pd.DataFrame:
     """
     Loads data from parquet into a dataframe
     :param filepath: String, file path to a parquet data format
-    :return:
+    :return: DataFrame, loaded from parquet file
     """
     try:
         expected_data = pd.read_parquet(filepath)
