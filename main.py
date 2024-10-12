@@ -1,51 +1,76 @@
+import asyncio
 import json
 import logging
 import os
-from typing import Any, Dict
+from typing import Any, Dict, List
 
+import httpx
 import pandas as pd
-import requests
-from pandas import DataFrame
 
 from utils import analyze_data, load_data
 
 logging.basicConfig(format="%(asctime)s -> %(message)s", level=logging.DEBUG)
 
 
-def fetch_actual_data(url: str, limit: int, skip: int) -> str:
+async def generate_urls(base_url: str, limit: int = 50) -> List[str]:
     """
-    Fetches product data from API/url
-    :param url: String, Url to be scraped
+    Generate a list of URLs for each page based on the total number of products and limit.
+    :param base_url: String, api endpoint to be scraped
     :param limit: Integer, limit size for pagination
-    :param skip: Integer, skip size to determine where to start next pagination
+    :return: List, generated list of URLs to be scraped
+    """
+    urls = []
+
+    async with httpx.AsyncClient() as client:
+        pre_flight = await fetch_data(client, f"{base_url}?limit=1")
+    total_products = pre_flight["total"]
+
+    for skip in range(0, total_products, limit):
+        urls.append(f"{base_url}?limit={limit}&skip={skip}")
+
+    return urls
+
+
+async def fetch_data(client: httpx.AsyncClient, url: str) -> Dict:
+    """
+    Fetch data from a single URL asynchronously using httpx.
+    :param client: AsyncClient, asynchronous HTTP client
+    :param url: String, api endpoint to be scraped
+    :return: Dictionary object of response data
+    """
+    response: httpx.Response = await client.get(url)
+    response.raise_for_status()
+    return response.json()
+
+
+async def fetch_actual_data(urls: List[str]) -> str:
+    """
+    Fetch all product data concurrently using pre-generated API/URLs.
+    :param urls: List, URLs to be scraped
     :return: String, filepath actual data is written out to
     """
     path, f_name = "./data/raw/", "raw_product_data.parquet"
     if not os.path.exists(path):
         os.mkdir(path)
 
-    params = {"limit": limit, "skip": skip}  # Pagination parameters
     products = []
-    total_products: int = 0
-    pre_flight: requests.Response = requests.get(url, params={"limit": 1})
-    if pre_flight.status_code == 200:
-        total_products = pre_flight.json()["total"]
-    else:
-        raise requests.exceptions.RequestException
 
-    while True:
-        data = requests.get(url, params=params).json()
-        products.extend(data["products"])
-        params["skip"] += data["limit"]
+    async with httpx.AsyncClient() as client:
+        # Create tasks for each URL in the list
+        tasks = [fetch_data(client, url) for url in urls]
 
-        if len(products) >= total_products:
-            break
+        # Wait for all tasks to complete
+        results = await asyncio.gather(*tasks)
 
-    # Calculate final price for each product
-    for product in products:
-        price = product["price"]
-        discount = product["discountPercentage"]
-        product["final_price"] = round(price - (price * discount / 100), 2)
+        # Process each result and collect products
+        for data in results:
+            products.extend(data["products"])
+
+        # Calculate the final price for each product
+        for product in products:
+            price = product["price"]
+            discount = product["discountPercentage"]
+            product["final_price"] = round(price - (price * discount / 100), 2)
 
     # Convert to DataFrame
     actual_df = pd.DataFrame(products)
@@ -56,22 +81,21 @@ def fetch_actual_data(url: str, limit: int, skip: int) -> str:
     return f"{path}{f_name}"
 
 
-def scraper(
-    url: str, expected_result_path: str, limit: int = 50, skip: int = 0
-) -> Dict:
+async def scraper(url: str, expected_result_path: str) -> Dict:
     """
     main function call
     :param url: String, api endpoint to be scraped
     :param expected_result_path: String, file path of expected product, *parquet
-    :param limit: Integer, limit size for pagination
-    :param skip: Integer, skip size to determine where to start next pagination
     :return: Dictionary object of analysis of result
     """
     logging.info(f"Starting scraper on Url: {url} ...")
 
+    # Generate the list of URLs for pagination
+    urls = await generate_urls(url)
+
     # Fetch actual data from API
     result: Dict[str, Any] = {}
-    actual_data_path = fetch_actual_data(url, limit, skip)
+    actual_data_path = await fetch_actual_data(urls)
     actual_df: pd.DataFrame = load_data(actual_data_path)
     logging.info("Loaded actual product data from parquet")
 
@@ -80,7 +104,6 @@ def scraper(
     logging.info("Loaded expected product data from parquet")
 
     # Analyze data and get the answers
-    price_matches: int
     most_expensive_product, missing_products, price_matches = analyze_data(
         actual_df, expected_df
     )
@@ -95,7 +118,8 @@ def scraper(
 
 
 if __name__ == "__main__":
+    # Run the event loop
     api = "https://dummyjson.com/products"
     product_prices_result_path = "./data/product_prices_calculated.parquet"
-    result = scraper(api, product_prices_result_path)
+    result = asyncio.run(scraper(api, product_prices_result_path))
     print(json.dumps(result, indent=4))
