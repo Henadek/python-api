@@ -118,7 +118,7 @@ async def scraper(url: str, expected_result_path: str) -> Dict:
 
 
 if __name__ == "__main__":
-    # Run the event loop
+    # Run the event loop in async
     api = "https://dummyjson.com/products"
     product_prices_result_path = "./data/product_prices_calculated.parquet"
     result = asyncio.run(scraper(api, product_prices_result_path))
