@@ -1,7 +1,7 @@
-## Python self-assessment task 
+## Python self-assessment task
 
 This Python task involves fetching data from API, JSON data handling, working with parquet files
-and performing simple calculations. Also, it requires basic git skills to upload the results. 
+and performing simple calculations. Also, it requires basic git skills to upload the results.
 You will need to compare two product lists - actual data from url and expected data stored in parquet file.
 
 ### Actual data
@@ -10,7 +10,7 @@ Get products data from `https://dummyjson.com/products`
 - Final price for each product can be calculated using 2 fields from the response - "price" and "discountPercentage"
 - **Please, do not overwrite expected data with actual data!** Use different path if you want to save actual data.
 
-### Expected data 
+### Expected data
 Stored in `./data/product_prices_calculated.parquet`
 - Final price in expected data is rounded to 2 decimal places
 
@@ -28,9 +28,9 @@ Stored in `./data/product_prices_calculated.parquet`
 5. Create PR into the master branch
 6. Share the PR link with our HR
 
-**Pay attention, that your code should follow PEP8 standards.** 
+**Pay attention, that your code should follow PEP8 standards.**
 - It should be easy to read, effective and explicit.
-- It's recommended to create separate functions for each step of your solution (modular programming). 
+- It's recommended to create separate functions for each step of your solution (modular programming).
 Like:
 ```
 get_actual_data()
@@ -39,5 +39,3 @@ find_most_expensive_product()
 ...
 ```
 Feel free to use your own naming. It's just the example.
-
-__If you have technical questions, feel free to reach out - dbulychev@jaxel.com or t.me/dena_den__
